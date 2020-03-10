@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text,TouchableOpacity, View, FlatList, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { StyleSheet
+  ,Text
+  ,TouchableOpacity
+  , View
+  , FlatList
+  , Alert
+  , TouchableWithoutFeedback
+  , Keyboard
+  , CheckBox } from 'react-native';
 import Header from './header';
 import { MaterialIcons} from '@expo/vector-icons';
 // import TodoItem from './todoItem';
 import AddTodo from './addTodo';
+//import { CheckBox } from 'react-native-elements'
+
 export default function Home({ navigation }) {
   const [todos, setTodos] = useState([
-    { text: 'buy coffe',time:'from 10 Am to 11 Am', key: '1' },
-    { text: 'create an app',time:'from 2 Pm to 4 Pm', key: '2' },
-    { text: 'play on the switch',time:'from 5 Pm to 6 Pm', key: '3' }
+    { text: 'buy coffe',time:'from 10 Am to 11 Am', key: '1' ,check:false},
+    { text: 'create an app',time:'from 2 Pm to 4 Pm', key: '2' ,check:false},
+    { text: 'play on the switch',time:'from 5 Pm to 6 Pm', key: '3',check:false }
   ]);
   
   const submitHandler = (text) => {
@@ -27,7 +37,13 @@ export default function Home({ navigation }) {
     }
 
   }
+  const pressHandler = (key) => {
+    setTodos((prevTodos)=>{
+      return prevTodos.filter(todo => {if((todo.key != key)== false){todo.check = !todo.check}return true });
+    })
+  }
   return (
+
     <TouchableWithoutFeedback onPress={() => {
       Keyboard.dismiss();
       console.log("Dismissed");
@@ -41,18 +57,22 @@ export default function Home({ navigation }) {
             <FlatList 
               data={todos}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => navigation.navigate('Details',item)}>
+                
                   <View style={styles.item}>
                   <MaterialIcons name='delete'  size={18} color={'#333'}/>
-                  <Text styles={styles.itemText}>{item.text}</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('Details',item)}>
+                  <Text style={item.check?styles.t:styles.f}>{item.text}</Text>
+                  </TouchableOpacity>
+                  <CheckBox style={styles.c} value= {item.check} onChange={()=>pressHandler(item.key)}/>
                   </View>
-                </TouchableOpacity>
+                
               )}
             />
           </View>
         </View>
       </View>
       </TouchableWithoutFeedback>
+      
   );
 }
 
@@ -83,6 +103,14 @@ item: {
   borderRadius: 10,
   flexDirection:'row',
   
+},t:{
+  marginLeft:10,
+  textDecorationLine:"line-through"
+},f:{
+  marginLeft:10,
+  textDecorationLine:"none"
+},c:{
+  marginLeft:20,
 }
 });
 
