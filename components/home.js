@@ -1,27 +1,40 @@
-import React, { useState,useEffect } from 'react';
-import { StyleSheet
-  ,Text
-  ,TouchableOpacity
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet
+  , Text
+  , TouchableOpacity
   , View
   , FlatList
   , Alert
   , TouchableWithoutFeedback
   , Keyboard
-  , CheckBox } from 'react-native';
-import Header from './header';
-import { MaterialIcons} from '@expo/vector-icons';
-// import TodoItem from './todoItem';
-import AddTodo from './addTodo';
-//import { CheckBox } from 'react-native-elements'
+  , CheckBox
+  , AsyncStorage
+  , Button
+} from 'react-native'; 
 
-export default function Home({ navigation },props) {
-  const [todos, setTodos] = useState([]);
-  useEffect(async () => {
+import { MaterialIcons } from '@expo/vector-icons';
+
+import AddTodo from './addTodo';
+
+
+export default function Home({ navigation }) {
+
+
+
+  const [todos, setTodos] = useState(null);
+  useEffect(() => {
+    myAsyncEffect()
+  }, []);
+  useEffect(() => {
+    AsyncStorage.setItem('todo', JSON.stringify(todos))
+  })
+  async function myAsyncEffect() {
     const response = await fetch("https://jsonplaceholder.typicode.com/todos?userId=1&fbclid=IwAR2cMmTxqnOf5Nj5zEaycaN5PexzsfvBVUK5okTQUXmNJGk_osqJT8OwyQU")
     const data = await response.json();
     const item = data;
     setTodos(item)
-  },[])
+  }
   const submitHandler = (title) => {
     if (title.length > 3) {
       setTodos((prevTodos) => {
@@ -38,13 +51,14 @@ export default function Home({ navigation },props) {
     }
 
   }
+
   const pressHandler = (id) => {
-    setTodos((prevTodos)=>{
-      return prevTodos.filter(todo => {if((todo.id != id)== false){todo.completed = !todo.completed}return true });
+    setTodos((prevTodos) => {
+      return prevTodos.filter(todo => { if ((todo.id != id) == false) { todo.completed = !todo.completed } return true });
     })
   }
   const ay5ra = (id) => {
-    setTodos((prevTodos)=>{
+    setTodos((prevTodos) => {
       return prevTodos.filter(todo => todo.id != id);
     })
   }
@@ -56,31 +70,32 @@ export default function Home({ navigation },props) {
     }}>
       <View style={styles.container}>
         {/* <Header /> */}
-        <View style = {styles.content}>
+        <View style={styles.content}>
           <AddTodo submitHandler={submitHandler}
           />
-          <View style ={styles.list}>
-            <FlatList 
+          {/* <Button onClick={() => window.location.reload(false)} title='Click to refresh' color='coral'/> */}
+          <View style={styles.list}>
+            <FlatList
               data={todos}
               renderItem={({ item }) => (
-                
-                  <View style={styles.item}>
-                  <TouchableOpacity onPress={() =>ay5ra(item.id) }>
-                  <MaterialIcons name='delete'  size={18} color={'#333'}/>
+                <View style={styles.item}>
+                  <TouchableOpacity onPress={() => ay5ra(item.id)}>
+                    <MaterialIcons name='delete' size={18} color={'#333'} />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => navigation.navigate('Details',item)}>
-                  <Text style={item.completed?styles.t:styles.f}>{item.title}</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('Details', item)}>
+                    <Text style={item.completed ? styles.t : styles.f}>{item.title}</Text>
                   </TouchableOpacity>
-                  <CheckBox style={styles.c} value= {item.completed} onChange={()=>pressHandler(item.id)}/>
-                  </View>
-                
+                  <CheckBox style={styles.c} value={item.completed} onChange={() => pressHandler(item.id)} />
+                </View>
               )}
             />
+
           </View>
         </View>
+
       </View>
-      </TouchableWithoutFeedback>
-      
+    </TouchableWithoutFeedback>
+
   );
 }
 
@@ -97,29 +112,29 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
     marginTop: 10,
-    
+
   },
-  itemText:{
-    marginLeft:10,
-},
-item: {
-  padding: 16,
-  marginTop: 16,
-  borderColor: '#bbb',
-  borderWidth: 1,
-  borderStyle: 'dashed',
-  borderRadius: 10,
-  flexDirection:'row',
-  
-},t:{
-  marginLeft:10,
-  textDecorationLine:"line-through"
-},f:{
-  marginLeft:10,
-  textDecorationLine:"none"
-},c:{
-  marginLeft:20,
-  
-}
+  itemText: {
+    marginLeft: 10,
+  },
+  item: {
+    padding: 16,
+    marginTop: 16,
+    borderColor: '#bbb',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderRadius: 10,
+    flexDirection: 'row',
+
+  }, t: {
+    marginLeft: 10,
+    textDecorationLine: "line-through"
+  }, f: {
+    marginLeft: 10,
+    textDecorationLine: "none"
+  }, c: {
+    marginLeft: 20,
+
+  }
 });
 
