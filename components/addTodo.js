@@ -15,6 +15,7 @@ const [text, setText] = useState('')
             style = {styles.input}
             placeholder = 'new todo ....'
             onChangeText = {changeHandler}
+            multiline={true}
             />
             <Button onPress={() => submitHandler(text)} title='add todo' color='coral'/>
         </View>
@@ -28,7 +29,8 @@ input: {
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd'
+    borderBottomColor: '#ddd',
+    
 
 }
 
