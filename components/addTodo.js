@@ -8,7 +8,9 @@ const [text, setText] = useState('')
     const changeHandler = (val) => {
         setText(val)
         
+
 }
+
 
     return (
         <View>

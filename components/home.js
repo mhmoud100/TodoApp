@@ -11,13 +11,10 @@ import {
   , CheckBox
   , AsyncStorage
   , Button
-  , ScrollView
-  , RefreshControl,
-  SafeAreaView
+  , ActivityIndicator
 } from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
-
 import AddTodo from './addTodo';
 
 
@@ -25,9 +22,8 @@ import AddTodo from './addTodo';
 
 export default function Home({ navigation }) {
 
-
-
-
+  const [get, setGet] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
@@ -48,7 +44,21 @@ export default function Home({ navigation }) {
     const response = await fetch("https://jsonplaceholder.typicode.com/todos?userId=1&fbclid=IwAR2cMmTxqnOf5Nj5zEaycaN5PexzsfvBVUK5okTQUXmNJGk_osqJT8OwyQU")
     const data = await response.json();
     const item = data;
+    if(data != {}){
+      setGet(true)
+    }else{
+      setGet(false)
+    }
     setTodos(item)
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+    }, 500)
+  }
+  const PressUpdateHandler = (id, title) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter(todo => { if ((todo.id != id) == false) { todo.title = title } return true });
+    })
   }
   const submitHandler = (title) => {
     if (title.length > 3) {
@@ -77,12 +87,16 @@ export default function Home({ navigation }) {
       return prevTodos.filter(todo => todo.id != id);
     })
   }
+
+
+
   return (
 
     <TouchableWithoutFeedback onPress={() => {
       Keyboard.dismiss();
       console.log("Dismissed");
     }}>
+
       <View style={styles.container}>
 
 
@@ -90,27 +104,31 @@ export default function Home({ navigation }) {
 
         {/* <Header /> */}
         <View style={styles.content}>
-          <AddTodo submitHandler={submitHandler}
-          />
+          <AddTodo submitHandler={submitHandler} />
+          {loading ?
+            <ActivityIndicator style={styles.re} size="large" color="#0000ff" />
+            :
+            <View style={styles.list}>
+              <FlatList
+                data={todos}
+                renderItem={({ item }) => (
+                  <View style={styles.item}>
+                    <TouchableOpacity onPress={() => ay5ra(item.id)} style={{ flexDirection: 'row' }}>
+                      <MaterialIcons name='delete' size={18} color={'#333'} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('Details', { item, PressUpdateHandler })} style={{ flexDirection: 'row', flex: 1 }} >
+                      <Text style={item.completed ? styles.t : styles.f}>{item.title}</Text>
+                    </TouchableOpacity>
+                    <CheckBox style={styles.c} value={item.completed} onChange={() => pressHandler(item.id)} />
 
-          <View style={styles.list}>
-            <FlatList
-              data={todos}
-              renderItem={({ item }) => (
-                <View style={styles.item}>
-                  <TouchableOpacity onPress={() => ay5ra(item.key)} style={{ flexDirection: 'row' }}>
-                    <MaterialIcons name='delete' size={18} color={'#333'} />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => navigation.navigate('Details', item)} style={{ flexDirection: 'row', flex: 1 }} >
-                    <Text style={item.completed ? styles.t : styles.f}>{item.title}</Text>
-                  </TouchableOpacity>
-                  <CheckBox style={styles.c} value={item.completed} onChange={() => pressHandler(item.id)} />
-
-                </View>
-              )}
-            />
-            <Button onPress={() => myAsyncEffect()} title='Click to refresh' color='coral' />
-          </View>
+                  </View>
+                )}
+              />
+              {get?
+              <Button onPress={() => myAsyncEffect()} title='Click to refresh' color='coral' />
+              :<Button onPress={() => displayData()} title='Click to refresh' color='black' />}
+            </View>
+}
         </View>
 
       </View>
@@ -158,6 +176,10 @@ const styles = StyleSheet.create({
   }, c: {
     marginLeft: 20,
 
+  },
+  re:{
+    justifyContent: 'center',
+    padding: 150
   }
 });
 
