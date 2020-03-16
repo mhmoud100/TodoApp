@@ -11,24 +11,39 @@ import {
   , CheckBox
   , AsyncStorage
   , Button
-} from 'react-native'; 
+  , ScrollView
+  , RefreshControl,
+  SafeAreaView
+} from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
 
 import AddTodo from './addTodo';
 
 
+
+
 export default function Home({ navigation }) {
 
 
 
-  const [todos, setTodos] = useState(null);
+
+  const [todos, setTodos] = useState([]);
+
   useEffect(() => {
     myAsyncEffect()
   }, []);
+
+
   useEffect(() => {
     AsyncStorage.setItem('todo', JSON.stringify(todos))
   })
+
+  const displayData = async () => {
+    const IntialTodo = await AsyncStorage.getItem('todo')
+    const parsed = JSON.parse(IntialTodo)
+    setTodos(parsed)
+  }
   async function myAsyncEffect() {
     const response = await fetch("https://jsonplaceholder.typicode.com/todos?userId=1&fbclid=IwAR2cMmTxqnOf5Nj5zEaycaN5PexzsfvBVUK5okTQUXmNJGk_osqJT8OwyQU")
     const data = await response.json();
@@ -69,31 +84,37 @@ export default function Home({ navigation }) {
       console.log("Dismissed");
     }}>
       <View style={styles.container}>
+
+
+
+
         {/* <Header /> */}
         <View style={styles.content}>
           <AddTodo submitHandler={submitHandler}
           />
-          {/* <Button onClick={() => window.location.reload(false)} title='Click to refresh' color='coral'/> */}
+
           <View style={styles.list}>
             <FlatList
               data={todos}
               renderItem={({ item }) => (
                 <View style={styles.item}>
-                  <TouchableOpacity onPress={() => ay5ra(item.id)}>
+                  <TouchableOpacity onPress={() => ay5ra(item.key)} style={{ flexDirection: 'row' }}>
                     <MaterialIcons name='delete' size={18} color={'#333'} />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => navigation.navigate('Details', item)}>
+                  <TouchableOpacity onPress={() => navigation.navigate('Details', item)} style={{ flexDirection: 'row', flex: 1 }} >
                     <Text style={item.completed ? styles.t : styles.f}>{item.title}</Text>
                   </TouchableOpacity>
                   <CheckBox style={styles.c} value={item.completed} onChange={() => pressHandler(item.id)} />
+
                 </View>
               )}
             />
-
+            <Button onPress={() => myAsyncEffect()} title='Click to refresh' color='coral' />
           </View>
         </View>
 
       </View>
+
     </TouchableWithoutFeedback>
 
   );
@@ -128,10 +149,12 @@ const styles = StyleSheet.create({
 
   }, t: {
     marginLeft: 10,
-    textDecorationLine: "line-through"
+    textDecorationLine: "line-through",
+    flexShrink: 1
   }, f: {
     marginLeft: 10,
-    textDecorationLine: "none"
+    textDecorationLine: "none",
+    flexShrink: 1
   }, c: {
     marginLeft: 20,
 
