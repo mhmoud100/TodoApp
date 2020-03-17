@@ -16,13 +16,13 @@ import {
 
 import { MaterialIcons } from '@expo/vector-icons';
 import AddTodo from './addTodo';
-
+import NetInfo from "@react-native-community/netinfo";
 
 
 
 export default function Home({ navigation }) {
 
-  const [get, setGet] = useState(false)
+  const [get, setGet] = useState(true)
   const [loading, setLoading] = useState(false);
   const [todos, setTodos] = useState([]);
 
@@ -39,22 +39,58 @@ export default function Home({ navigation }) {
     const IntialTodo = await AsyncStorage.getItem('todo')
     const parsed = JSON.parse(IntialTodo)
     setTodos(parsed)
-  }
-  async function myAsyncEffect() {
-    const response = await fetch("https://jsonplaceholder.typicode.com/todos?userId=1&fbclid=IwAR2cMmTxqnOf5Nj5zEaycaN5PexzsfvBVUK5okTQUXmNJGk_osqJT8OwyQU")
-    const data = await response.json();
-    const item = data;
-    if(data != {}){
-      setGet(true)
-    }else{
-      setGet(false)
-    }
-    setTodos(item)
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
     }, 500)
   }
+  async function myAsyncEffect() {
+    try {
+      
+      const response = await fetch("https://jsonplacehol2der.typicode.com/todos?userId=1&fbclid=IwAR2cMmTxqnOf5Nj5zEaycaN5PexzsfvBVUK5okTQUXmNJGk_osqJT8OwyQU")
+      const data = await response.json();
+      const item = data;
+      setGet(true)
+      setTodos(item)
+      setLoading(true)
+      setTimeout(() => {
+        setLoading(false)
+      }, 500)
+      
+    } catch (error) {
+      console.log(error)
+      setGet(false)
+    }
+   
+
+   
+
+
+  }
+  
+
+
+  const storeData = async () => {
+    try {
+      await AsyncStorage.setItem("items", JSON.stringify(todos));
+      console.log(JSON.stringify(todos))
+    } catch (error) {
+      // Error saving data
+      console.log(error)
+    }
+  };
+  const retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('items');
+      if (value !== null) {
+        // We have data!!
+        console.log(value);
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error)
+    }
+  };
   const PressUpdateHandler = (id, title) => {
     setTodos((prevTodos) => {
       return prevTodos.filter(todo => { if ((todo.id != id) == false) { todo.title = title } return true });
@@ -68,6 +104,8 @@ export default function Home({ navigation }) {
           ...prevTodos
         ];
       })
+      storeData()
+      retrieveData();
     } else {
       Alert.alert('oppos', 'todo must be over 3 chars long', [
         { title: 'Understood', onPress: () => console.log('alert closed') }
@@ -81,11 +119,15 @@ export default function Home({ navigation }) {
     setTodos((prevTodos) => {
       return prevTodos.filter(todo => { if ((todo.id != id) == false) { todo.completed = !todo.completed } return true });
     })
+    storeData()
+    retrieveData();
   }
   const ay5ra = (id) => {
     setTodos((prevTodos) => {
       return prevTodos.filter(todo => todo.id != id);
     })
+    storeData()
+    retrieveData();
   }
 
 
@@ -127,8 +169,9 @@ export default function Home({ navigation }) {
               {get?
               <Button onPress={() => myAsyncEffect()} title='Click to refresh' color='coral' />
               :<Button onPress={() => displayData()} title='Click to refresh' color='black' />}
+
             </View>
-}
+          }
         </View>
 
       </View>
@@ -177,7 +220,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
 
   },
-  re:{
+  re: {
     justifyContent: 'center',
     padding: 150
   }
