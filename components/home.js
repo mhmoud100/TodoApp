@@ -38,36 +38,39 @@ export default function Home({ navigation }) {
   const displayData = async () => {
     const IntialTodo = await AsyncStorage.getItem('todo')
     const parsed = JSON.parse(IntialTodo)
+
     setTodos(parsed)
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
     }, 500)
+    myAsyncEffect()
   }
   async function myAsyncEffect() {
     try {
-      
-      const response = await fetch("https://jsonplacehol2der.typicode.com/todos?userId=1&fbclid=IwAR2cMmTxqnOf5Nj5zEaycaN5PexzsfvBVUK5okTQUXmNJGk_osqJT8OwyQU")
+
+      const response = await fetch("https://jsonplaceholder.typicode.com/todos?userId=1&fbclid=IwAR2cMmTxqnOf5Nj5zEaycaN5PexzsfvBVUK5okTQUXmNJGk_osqJT8OwyQU")
       const data = await response.json();
       const item = data;
-      setGet(true)
+
       setTodos(item)
       setLoading(true)
       setTimeout(() => {
         setLoading(false)
       }, 500)
-      
+      setGet(true)
+
     } catch (error) {
       console.log(error)
       setGet(false)
     }
-   
 
-   
+
+
 
 
   }
-  
+
 
 
   const storeData = async () => {
@@ -138,18 +141,24 @@ export default function Home({ navigation }) {
       Keyboard.dismiss();
       console.log("Dismissed");
     }}>
+      {loading ?
+        <ActivityIndicator style={styles.re} size="large" color="#0000ff" />
+        :
+        <View style={styles.container}>
+          {get ?
+            <View></View>
+            : <TouchableOpacity onPress={() => displayData()}>
+            <Text style={styles.text}>
+              it seems you are offline, tab here or press refresh when you got connected
+         </Text>
+          </TouchableOpacity>
 
-      <View style={styles.container}>
+          }
 
 
+          <View style={styles.content}>
+            <AddTodo submitHandler={submitHandler} />
 
-
-        {/* <Header /> */}
-        <View style={styles.content}>
-          <AddTodo submitHandler={submitHandler} />
-          {loading ?
-            <ActivityIndicator style={styles.re} size="large" color="#0000ff" />
-            :
             <View style={styles.list}>
               <FlatList
                 data={todos}
@@ -166,16 +175,25 @@ export default function Home({ navigation }) {
                   </View>
                 )}
               />
-              {get?
-              <Button onPress={() => myAsyncEffect()} title='Click to refresh' color='coral' />
-              :<Button onPress={() => displayData()} title='Click to refresh' color='black' />}
+              {get ?
+                <Button onPress={() => myAsyncEffect()} title='Click to refresh' color='coral' />
+                : <Button onPress={() => displayData()} title='Click to refresh' color='coral' />
+
+              }
+              {/* {!get ?
+                <TouchableOpacity onPress={() => myAsyncEffect()}>
+                  <Text style={styles.text}>
+                    it seems you are offline, tab here or press refresh when you got connected
+               </Text>
+                </TouchableOpacity>
+                : <View></View>} */}
 
             </View>
-          }
+
+          </View>
+
         </View>
-
-      </View>
-
+      }
     </TouchableWithoutFeedback>
 
   );
@@ -223,6 +241,9 @@ const styles = StyleSheet.create({
   re: {
     justifyContent: 'center',
     padding: 150
+  },
+  text: {
+    backgroundColor: 'yellow'
   }
 });
 
