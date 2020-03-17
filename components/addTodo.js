@@ -18,10 +18,11 @@ const [text, setText] = useState('')
             style = {styles.input}
             placeholder = 'new todo ....'
             onChangeText = {changeHandler}
-            
+            value={text}
             multiline={true}
             />
-            <Button onPress={() => submitHandler(text)} title='add todo' color='coral'/>
+            <Button onPress={() => {submitHandler(text)
+                 setText('')}} title='add todo' color='coral'/>
         </View>
     )
 }

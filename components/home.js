@@ -167,7 +167,8 @@ export default function Home({ navigation }) {
                     <TouchableOpacity onPress={() => ay5ra(item.id)} style={{ flexDirection: 'row' }}>
                       <MaterialIcons name='delete' size={18} color={'#333'} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('Details', { item, PressUpdateHandler })} style={{ flexDirection: 'row', flex: 1 }} >
+                    <TouchableOpacity onPress={() => {!item.completed? navigation.navigate('Details', { item, PressUpdateHandler }):
+                    console.log()}} style={{ flexDirection: 'row', flex: 1 }} >
                       <Text style={item.completed ? styles.t : styles.f}>{item.title}</Text>
                     </TouchableOpacity>
                     <CheckBox style={styles.c} value={item.completed} onChange={() => pressHandler(item.id)} />
